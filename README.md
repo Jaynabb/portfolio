@@ -54,6 +54,28 @@ A focused sales-navigation tool with a lead dashboard, built on a Vite/React/sha
 
 ---
 
+## 🩺 ChiroScribe — local-first AI medical scribe for chiropractors
+*Desktop app · Electron · React + TypeScript · Claude (Anthropic SDK) · better-sqlite3 · WebSocket audio*
+
+A desktop AI notetaker that listens to a chiropractic visit and turns it into structured clinical notes, so the practitioner can focus on the patient instead of charting. Built as a desktop app on purpose: audio and patient data stay **local-first** (on-device SQLite), which is the right default for a healthcare workflow.
+
+**What I built:** the entire Electron app — a WebSocket audio-capture pipeline in the main process, **Claude-backed note generation** (Anthropic SDK), a local `better-sqlite3` store for patients/visits/notes, Zod-validated IPC between the main and renderer processes, and a React UI.
+
+**Why it's interesting:** turning live audio into reliable, structured medical notes — with a privacy-conscious, local-first architecture instead of shipping patient audio to the cloud.
+
+---
+
+## ⚖️ LegalFlow — legal client-intake command center
+*Web app · React (Vite) · Express · built for a law firm (Richards Law)*
+
+An intake "command center" built for a law firm to compress the path from prospective client to signed, onboarded client — capturing intake details and automating **retainer-agreement generation**. A React/Vite front end over an Express API, built rapid-fire as a hackathon project and demoed end to end.
+
+**What I built:** the full app — the `IntakeCommandCenter` UI and the Express backend driving intake and document generation. ([code](https://github.com/Jaynabb/richards-law-intake))
+
+**Why it's interesting:** shows I can take a real client's workflow from zero to a working, demoable product fast.
+
+---
+
 ## 🛠️ Other work
 A range of smaller production and prototype projects on [my GitHub](https://github.com/Jaynabb?tab=repositories) — AI invoice-extraction agents, a windshield-damage analyzer, a receiving-verification system, legal-intake automation, and review-scraping tools — most built around the same theme: **putting an LLM somewhere a business actually needed a decision made.**
 
