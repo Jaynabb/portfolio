@@ -59,7 +59,7 @@ A focused sales-navigation tool with a lead dashboard, built on a Vite/React/sha
 
 A desktop AI notetaker that listens to a chiropractic visit and turns it into structured clinical notes, so the practitioner can focus on the patient instead of charting. Built as a desktop app on purpose: audio and patient data stay **local-first** (on-device SQLite), which is the right default for a healthcare workflow.
 
-**What I built:** the entire Electron app — a WebSocket audio-capture pipeline in the main process, **Claude-backed note generation** (Anthropic SDK), a local `better-sqlite3` store for patients/visits/notes, Zod-validated IPC between the main and renderer processes, and a React UI.
+**What I built:** the entire Electron app — a WebSocket audio-capture pipeline in the main process, **Claude-backed note generation** (Anthropic SDK), a local `better-sqlite3` store for patients/visits/notes (API keys encrypted at rest via Electron `safeStorage`), Zod-validated IPC between the main and renderer processes, and a React UI. ([code](https://github.com/Jaynabb/Chiro))
 
 **Why it's interesting:** turning live audio into reliable, structured medical notes — with a privacy-conscious, local-first architecture instead of shipping patient audio to the cloud.
 
