@@ -1,12 +1,23 @@
 # Jamari "Jay" McNabb — AI Engineer & Builder
 
-I design and ship production AI systems end to end — from LLM-powered extraction pipelines and lead-scoring engines to multi-agent operating systems. I'm the **CTO and sole technical lead of [Edge AI Growth LLC](https://github.com/edge-ai-growth)**, a productized AI agency + SaaS company, where I've built and shipped the products below to real paying customers across the US and Latin America.
+I design and ship production AI systems end to end — from company-wide automation operating systems to LLM-powered extraction pipelines, lead-scoring engines, and multi-tenant SaaS. I've built and shipped the products below to real paying businesses across the US and Latin America, working as the technical lead from architecture through production.
 
 I work in the Claude / OpenAI / Gemini stack, ship continuously to production (Vercel, Firebase, Supabase), and care about the unglamorous parts — auth, billing, webhooks, RLS, and making AI output reliable enough to bet a business on.
 
 📫 **jamarijmcnabb@gmail.com** · [GitHub @Jaynabb](https://github.com/Jaynabb)
 
 > **About this repo:** The flagship products below are closed-source company assets that handle live customer data, so the source isn't public. This is a curated walkthrough of what I built, the problems they solve, and the architecture decisions behind them. Happy to do a live code walkthrough in an interview.
+
+---
+
+## 🧠 AIOS — an AI operating system that runs a company's stack
+*Python · Claude-based agent & skill architecture · multi-source connector framework · live orchestration*
+
+AIOS is an AI operations layer that sits on top of whatever tools a company already runs and makes them work as one system. It automates **any combination of a company's stack** — Slack, CRMs (GoHighLevel), databases (Firestore/Supabase), meeting transcripts, docs, spreadsheets — wires them together so they **talk to each other**, and gives an AI agent **shared context across all of them**. Then it acts: it **pulls live meeting transcriptions and turns them into decisions and action items**, **monitors Slack** for things that need attention, builds cross-source status boards, and automates recurring operational work. The idea is to hand a business an AI operator that already knows everything happening across its tools — and can take it from there.
+
+**What I built:** the full system — a connector framework that normalizes any company's tools to a common interface, a context layer that gives agents shared memory across every source, and a skill library (meeting-transcript → decisions/actions, cross-source status boards, live monitoring, extraction-replay verification, CRM/snapshot ops). Architected on a **deterministic spine with AI judgment at the decision points** — deterministic where it must be reliable, AI where judgment actually adds value. Each deployment is provisioned per-company from their real stack rather than copy-pasted.
+
+**Why it's interesting:** it's a serious attempt at the "AI that runs your operations" problem — not a chatbot, but a system that ingests everything a company does across every tool and acts on it.
 
 ---
 
@@ -33,17 +44,6 @@ A package-tracking and customs-management system built for import businesses in 
 **What I built:** the full stack — Gemini + Cloud Vision extraction pipeline with OCR fallback (Tesseract), Firestore data model and CRUD with activity logs, automatic duty/VAT calculation engine, Twilio SMS notifications across the package lifecycle (received → in customs → ready → delivered), and CSV/Sheets export for CRM.
 
 **Why it's interesting:** real money rides on the extraction being right. Getting structured, total-reconciled output out of photos of messy real-world receipts — and verifying a prompt change actually improves it *before* shipping — is the hard, valuable part.
-
----
-
-## 🧠 AIOS — an AI operating system for a productized agency
-*Python · Claude Code plugin/skill architecture · OpenAI · connector framework*
-
-The internal system that lets Edge AI deliver "an AI operations layer" to customers as a product. AIOS provisions a custom **"AIOS Jr"** workspace per customer — context files, GTD scaffolding, connector wiring (Slack, Firestore/Supabase, GHL, Gemini transcripts), and a tailored skill set — built from a discovery call or website rather than copy-pasted.
-
-**What I built:** the provisioning spine and the skill/plugin layer — deterministic provisioning steps with AI judgment at the decision points, a connector framework, and reusable skills (customer status boards, meeting-transcript → decisions/actions, extraction-replay verification, GHL snapshot ops). The design principle throughout: **deterministic where it must be reliable, AI where judgment adds value.**
-
-**Why it's interesting:** it's a real attempt to make AI delivery *scale past founder-hours* — turning a custom consulting engagement into a repeatable, productized install.
 
 ---
 
