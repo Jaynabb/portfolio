@@ -1,14 +1,50 @@
 # Jamari "Jay" McNabb — AI Engineer & Builder
 
-I design and ship production AI systems end to end — from company-wide automation operating systems to LLM-powered extraction pipelines, lead-scoring engines, and multi-tenant SaaS. I've built and shipped the products below to real paying businesses across the US and Latin America, working as the technical lead from architecture through production.
+I design and ship production AI systems end to end — from company-wide automation operating systems to LLM-powered extraction pipelines, lead-scoring engines, and multi-tenant SaaS. Most of what's below shipped to real paying businesses across the US and Latin America, with me as the technical lead from architecture through production. The two projects at the top are recent agentic builds where the entire source is public.
 
 I work in the Claude / OpenAI / Gemini stack, ship continuously to production (Vercel, Firebase, Supabase), and care about the unglamorous parts — auth, billing, webhooks, RLS, and making AI output reliable enough to bet a business on.
 
 📫 **jamarijmcnabb@gmail.com** · [GitHub @Jaynabb](https://github.com/Jaynabb)
 
-> **About this repo:** The flagship products below are closed-source company assets that handle live customer data, so the source isn't public. This is a curated walkthrough of what I built, the problems they solve, and the architecture decisions behind them. Happy to do a live code walkthrough in an interview.
+> **About this repo:** The first two projects are open — full source, prompts, evals and all, linked below. The rest are closed-source company assets that handle live customer data, so those are a curated walkthrough of what I built and the architecture decisions behind them. Happy to do a live code walkthrough of any of it.
 
 ---
+
+# Open source — read the code
+
+Two recent builds where the whole thing is public, including the prompts and the eval harnesses. Both are agentic systems with a deterministic spine, and in both the interesting part is the same: **making an LLM's judgment checkable.**
+
+## 🏉 Cart Win-Back — three agents deciding who *not* to spend money on
+*Next.js 15 · TypeScript · Claude Haiku 4.5 + Sonnet · Zod · deterministic policy layer · eval harness*
+**[Source →](https://github.com/Jaynabb/envorso-cart-winback)**
+
+A rugby club's abandoned ticket carts. Every win-back tool asks "how do we recover this cart?" — but the easiest carts to recover were coming back anyway, and the result can't tell you which. The fan buys, it looks like the offer worked, and the club sold the same tickets for less. So this asks a different question: **would this fan have come back on their own?** The less likely, the more we give. Not the size of the cart, not how loyal they are.
+
+Four steps. A deterministic rules layer first — you shouldn't need a language model to notice you don't have permission to email someone. Then three agents with typed handoffs, two of them deliberately kept in the dark: the one reading the fan is never told the cart value, and the one arguing against the offer is never told why it was chosen. A marketer approves, edits or rejects every offer. Nothing sends itself.
+
+**What I built:** all of it — the rules, the three agents and the contracts between them, forced tool use with Zod validation and a corrective retry, an eval harness scored against an answer key I wrote before any model ran, label-free invariants that run on any day's carts, and the console a marketer actually works from. Half a cent per cart.
+
+**Why it's interesting:** the failure mode isn't hallucination, it's an agent reasoning perfectly from a number nobody checked. My own price list said a free seat upgrade cost nothing, so the agents handed them out — the honest figure is $36 against $7 for a discount. Most of the work was finding numbers I'd invented and deleting them: eleven policy thresholds went, exactly one decision changed, and it got cheaper.
+
+---
+
+## 📥 Inbound Triage — one question, asked of every message
+*Next.js · TypeScript · Claude Haiku 4.5 · Zod · eval harness*
+**[Source →](https://github.com/Jaynabb/inbound-triage-assistant)**
+
+An advisory firm's shared inbox, where messages arrive by email, web form, LinkedIn and transcribed voicemail — and the channel changes what you do about them. Each gets a summary, a category, a priority and a next action.
+
+**Priority is one question: what breaks if this waits?** It says nothing about money on purpose — an $8M prospect with no deadline is medium; a client whose lender needs an answer by Friday is high. The sender doesn't get to set it either: "urgent!" doesn't raise it and "no rush" doesn't lower it.
+
+**What I built:** the whole thing — the triage route with the API key server-side, a pre-flight filter that catches junk before it costs an API call and reads the body only, never the subject, because the most urgent message in the inbox is a voicemail and voicemails have no subject line. Seven categories, because three real messages don't fit the four the brief suggested. An eval harness scoring 24/24 against an answer key written by hand first.
+
+**Why it's interesting:** a failed API call is not an unreadable message, and treating them the same teaches an operator to ignore both. Failures get their own band, a reason written for a person rather than an API payload, and a retry that re-runs exactly the rows you tick.
+
+---
+
+# Shipped to paying businesses
+
+Closed-source, so these are walkthroughs rather than code.
 
 ## 🧠 AIOS — an AI operating system that runs a company's stack
 *Python · Claude-based agent & skill architecture · multi-source connector framework · live orchestration*
