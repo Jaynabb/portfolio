@@ -1,22 +1,22 @@
 # Jamari "Jay" McNabb — AI Engineer & Builder
 
-I design and ship production AI systems end to end — from company-wide automation operating systems to LLM-powered extraction pipelines, lead-scoring engines, and multi-tenant SaaS. Most of what's below shipped to real paying businesses across the US and Latin America, with me as the technical lead from architecture through production. The two projects at the top are recent agentic builds where the entire source is public.
+I design and ship production AI systems end to end — from company-wide automation operating systems to LLM-powered extraction pipelines, lead-scoring engines, and multi-tenant SaaS. Most of what's below shipped to real paying businesses across the US and Latin America, with me as the technical lead from architecture through production.
 
 I work in the Claude / OpenAI / Gemini stack, ship continuously to production (Vercel, Firebase, Supabase), and care about the unglamorous parts — auth, billing, webhooks, RLS, and making AI output reliable enough to bet a business on.
 
 📫 **jamarijmcnabb@gmail.com** · [GitHub @Jaynabb](https://github.com/Jaynabb)
 
-> **About this repo:** The first two projects are open — full source, prompts, evals and all, linked below. The rest are closed-source company assets that handle live customer data, so those are a curated walkthrough of what I built and the architecture decisions behind them. Happy to do a live code walkthrough of any of it.
+> **About this repo:** two of these are open — full source, prompts, evals and all, marked **open source** and linked below. The rest are closed-source company assets that handle live customer data, so those are a curated walkthrough of what I built and the architecture decisions behind them. Happy to do a live code walkthrough of any of it.
 
 ---
 
-# Open source — read the code
+# Multi-agent systems
 
-Two recent builds where the whole thing is public, including the prompts and the eval harnesses. Both are agentic systems with a deterministic spine, and in both the interesting part is the same: **making an LLM's judgment checkable.**
+Two builds where multiple agents divide a decision between them and hand off under a contract. Different scales — one is a four-stage pipeline you can read in an afternoon, the other is a company's whole operation — but the same rule underneath: **a deterministic spine, with agents only at the points where judgment actually adds value.**
 
 ## 🏉 Cart Win-Back — three agents deciding who *not* to spend money on
 *Next.js 15 · TypeScript · Claude Haiku 4.5 + Sonnet · Zod · deterministic policy layer · eval harness*
-**[Source →](https://github.com/Jaynabb/envorso-cart-winback)**
+**[Source →](https://github.com/Jaynabb/envorso-cart-winback)** · open source
 
 A rugby club's abandoned ticket carts. Every win-back tool asks "how do we recover this cart?" — but the easiest carts to recover were coming back anyway, and the result can't tell you which. The fan buys, it looks like the offer worked, and the club sold the same tickets for less. So this asks a different question: **would this fan have come back on their own?** The less likely, the more we give. Not the size of the cart, not how loyal they are.
 
@@ -28,32 +28,34 @@ Four steps. A deterministic rules layer first — you shouldn't need a language 
 
 ---
 
+## 🧠 AIOS — agents that run a company's operations, and stay quiet
+*Python · Claude agent + skill architecture · SQLite warehouse · 56-connector registry · scheduled headless agents · Telegram*
+
+Every company runs on a different pile of tools — Slack here, a CRM there, meeting transcripts sitting in Gmail, the real bug list in a Google Doc somebody edits by hand. Nothing talks to anything, so a person becomes the integration layer, and that's the job that never ends. AIOS replaces that person-shaped glue: it pulls every source into one warehouse on a schedule, gives agents shared context across all of it, and then runs the recurring work itself.
+
+**The rule is a deterministic spine with agents only at the decision points.** Collection, scheduling, provisioning and routing are plain Python that either works or throws — no model gets to decide whether a sync succeeded. The agents are used where judgment is the actual product: reading a meeting transcript for decisions and who owns them, deciding whether a change in the numbers is worth interrupting someone for, turning a discovery call into a build spec.
+
+The agents divide work in two places. **Research** runs a recon agent first to find where the signal lives, then three to six topic agents in parallel across seven platforms, then a **critic agent that reviews their reports before the synthesis agent is allowed to write anything** — the critic exists because parallel agents agree with each other far too easily, and three reports converging is not evidence. **Provisioning** is an agent that reads raw discovery material, drafts a structured audit of the company's stack, and hands it to a schema validator and a deterministic provisioner; I approve the audit, the machine builds the deployment.
+
+**What I built:** all of it — a connector registry normalizing 56 tools to one warehouse schema, the collectors behind it, a skill library (meeting transcript → decisions and owners, cross-source status boards, extraction verification, CRM ops), the multi-agent research pipeline, the scheduling layer that runs skills headlessly and routes their output to a phone with approve / edit / hold buttons, and a conversational agent with read-only tools over the warehouse so the whole system answers questions by text or voice.
+
+**Why it's interesting:** the hard part wasn't making it report, it was making it shut up. A daily brief that dutifully tells you everything is fine trains you to stop reading it inside a week — and then it's worse than nothing, because you'll miss the day it isn't fine. So a scheduled job that finds nothing worth saying emits a single token, and that token becomes one line instead of a report. The system is in-the-loop-by-exception on purpose: it has to earn attention rather than assume it.
+
+---
+
+# Other production builds
+
 ## 📥 Inbound Triage — one question, asked of every message
 *Next.js · TypeScript · Claude Haiku 4.5 · Zod · eval harness*
-**[Source →](https://github.com/Jaynabb/inbound-triage-assistant)**
+**[Source →](https://github.com/Jaynabb/inbound-triage-assistant)** · open source
 
-An advisory firm's shared inbox, where messages arrive by email, web form, LinkedIn and transcribed voicemail — and the channel changes what you do about them. Each gets a summary, a category, a priority and a next action.
+An advisory firm's shared inbox, where messages arrive by email, web form, LinkedIn and transcribed voicemail — and the channel changes what you do about them. Each gets a summary, a category, a priority and a next action. One agent, deliberately: the whole design is one well-defined judgment made consistently, not a committee.
 
 **Priority is one question: what breaks if this waits?** It says nothing about money on purpose — an $8M prospect with no deadline is medium; a client whose lender needs an answer by Friday is high. The sender doesn't get to set it either: "urgent!" doesn't raise it and "no rush" doesn't lower it.
 
 **What I built:** the whole thing — the triage route with the API key server-side, a pre-flight filter that catches junk before it costs an API call and reads the body only, never the subject, because the most urgent message in the inbox is a voicemail and voicemails have no subject line. Seven categories, because three real messages don't fit the four the brief suggested. An eval harness scoring 24/24 against an answer key written by hand first.
 
 **Why it's interesting:** a failed API call is not an unreadable message, and treating them the same teaches an operator to ignore both. Failures get their own band, a reason written for a person rather than an API payload, and a retry that re-runs exactly the rows you tick.
-
----
-
-# Shipped to paying businesses
-
-Closed-source, so these are walkthroughs rather than code.
-
-## 🧠 AIOS — an AI operating system that runs a company's stack
-*Python · Claude-based agent & skill architecture · multi-source connector framework · live orchestration*
-
-AIOS is an AI operations layer that sits on top of whatever tools a company already runs and makes them work as one system. It automates **any combination of a company's stack** — Slack, CRMs (GoHighLevel), databases (Firestore/Supabase), meeting transcripts, docs, spreadsheets — wires them together so they **talk to each other**, and gives an AI agent **shared context across all of them**. Then it acts: it **pulls live meeting transcriptions and turns them into decisions and action items**, **monitors Slack** for things that need attention, builds cross-source status boards, and automates recurring operational work. The idea is to hand a business an AI operator that already knows everything happening across its tools — and can take it from there.
-
-**What I built:** the full system — a connector framework that normalizes any company's tools to a common interface, a context layer that gives agents shared memory across every source, and a skill library (meeting-transcript → decisions/actions, cross-source status boards, live monitoring, extraction-replay verification, CRM/snapshot ops). Architected on a **deterministic spine with AI judgment at the decision points** — deterministic where it must be reliable, AI where judgment actually adds value. Each deployment is provisioned per-company from their real stack rather than copy-pasted.
-
-**Why it's interesting:** it's a serious attempt at the "AI that runs your operations" problem — not a chatbot, but a system that ingests everything a company does across every tool and acts on it.
 
 ---
 
@@ -83,13 +85,6 @@ A package-tracking and customs-management system built for import businesses in 
 
 ---
 
-## 🧭 KVM Sales Navigator — voice-enabled sales tool
-*Vite · React · TypeScript · shadcn/ui · Supabase · ElevenLabs*
-
-A focused sales-navigation tool with a lead dashboard, built on a Vite/React/shadcn front end with a Supabase backend and **ElevenLabs voice** integration. Demonstrates rapid, clean product development with a modern component system and edge-function backend.
-
----
-
 ## 🩺 ChiroScribe — local-first AI medical scribe for chiropractors
 *Desktop app · Electron · React + TypeScript · Claude (Anthropic SDK) · better-sqlite3 · WebSocket audio*
 
@@ -98,6 +93,13 @@ A desktop AI notetaker that listens to a chiropractic visit and turns it into st
 **What I built:** the entire Electron app — a WebSocket audio-capture pipeline in the main process, **Claude-backed note generation** (Anthropic SDK), a local `better-sqlite3` store for patients/visits/notes (API keys encrypted at rest via Electron `safeStorage`), Zod-validated IPC between the main and renderer processes, and a React UI. ([code](https://github.com/Jaynabb/Chiro))
 
 **Why it's interesting:** turning live audio into reliable, structured medical notes — with a privacy-conscious, local-first architecture instead of shipping patient audio to the cloud.
+
+---
+
+## 🧭 KVM Sales Navigator — voice-enabled sales tool
+*Vite · React · TypeScript · shadcn/ui · Supabase · ElevenLabs*
+
+A focused sales-navigation tool with a lead dashboard, built on a Vite/React/shadcn front end with a Supabase backend and **ElevenLabs voice** integration. Demonstrates rapid, clean product development with a modern component system and edge-function backend.
 
 ---
 
@@ -119,7 +121,7 @@ A range of smaller production and prototype projects on [my GitHub](https://gith
 
 ## Stack at a glance
 **Languages:** TypeScript, JavaScript, Python
-**AI/LLM:** Claude API (Anthropic SDK), OpenAI, Google Gemini + Cloud Vision, prompt engineering, structured extraction, LLM scoring
+**AI/LLM:** Claude API (Anthropic SDK), OpenAI, Google Gemini + Cloud Vision, multi-agent orchestration, prompt engineering, structured extraction, eval harnesses
 **Frontend:** Next.js (App Router), React, Vite, Tailwind, shadcn/ui
 **Backend/Data:** Supabase (Postgres + RLS), Firebase/Firestore, Node, serverless/edge functions, Zod
 **Infra/Integrations:** Vercel, Stripe, Twilio, Meta Ads, GoHighLevel, Resend, ElevenLabs
